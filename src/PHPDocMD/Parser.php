@@ -88,7 +88,7 @@ class Parser
                 ));
             $className = ltrim($className,'\\');
 
-            $fileName = str_replace('\\','-', $className) . '.md';
+            $fileName = str_replace('\\','-', $className) ;
 
             $implements = array();
 
@@ -105,8 +105,9 @@ class Parser
 
             }
 
-            $classNames[(string)$class->full_name] = array(
-                'fileName' => $fileName,
+            $classNames[$className] = array(
+                'linkName' => $fileName,
+                'fileName' => $fileName. '.md',
                 'className' => $className,
                 'realName' => (string)$class->full_name,
                 'packageName' => $class['package'],

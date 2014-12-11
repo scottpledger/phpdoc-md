@@ -76,8 +76,16 @@ class Generator
         $twig = new Twig_Environment($loader);
 
         // Sad, sad globals
-        $GLOBALS['PHPDocMD_classDefinitions'] = $this->classDefinitions;
+        $classLookup = array();
+        foreach($this->classDefinitions as $className => $class){
+            $classLookup[$className] = $class;
+            $classLookup[ltrim($className,"\\") ] = $class;
+            $classLookup[ltrim($class['realName'],"\\")] = $class;
+        }
+        $GLOBALS['PHPDocMD_classDefinitions'] = $classLookup;
         $GLOBALS['PHPDocMD_linkTemplate'] = $this->linkTemplate;
+
+
 
         $twig->addFilter('classLink', new Twig_Filter_Function('PHPDocMd\\Generator::classLink'));
         foreach($this->classDefinitions as $className=>$data) {
@@ -173,6 +181,8 @@ class Generator
 
         foreach(explode('|', $className) as $oneClass) {
 
+            $oClassName=$oneClass;
+
             $oneClass = trim($oneClass,'\\');
 
             $myLabel = $label?:$oneClass;
@@ -188,11 +198,9 @@ class Generator
                 $returnedClasses[] = $oneClass;
 
             } else {
+                $theClass = $classDefinitions[$oneClass];
 
-                $link = str_replace('\\', '-', $oneClass);
-                $link = strtr($linkTemplate, array('%c' => $link));
-
-                $returnedClasses[] = "[" . $myLabel . "](" . $link . ')';
+                $returnedClasses[] = "[" . $myLabel . "](" . $theClass['linkName'] . ')';
 
             }
 
