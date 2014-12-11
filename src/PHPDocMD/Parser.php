@@ -29,14 +29,22 @@ class Parser
     protected $classDefinitions;
 
     /**
+     * The template to use.
+     *
+     * @var string
+     */
+    protected $template;
+
+    /**
      * Constructor
      *
      * @param string $structureXmlFile
      */
-    public function __construct($structureXmlFile)
+    public function __construct($structureXmlFile,$template='%c.md')
     {
 
         $this->structureXmlFile = $structureXmlFile;
+        $this->template = $template;
 
     }
 
@@ -73,7 +81,11 @@ class Parser
 
         foreach($xml->xpath('file/class|file/interface') as $class) {
 
-            $className = (string)$class->full_name;
+            $className = strtr($this->template,array(
+                '%C'=>(string)$class->full_name,
+                '%c'=>(string)$class->name,
+                '%p'=>(string)$class['package']
+                ));
             $className = ltrim($className,'\\');
 
             $fileName = str_replace('\\','-', $className) . '.md';
@@ -93,9 +105,11 @@ class Parser
 
             }
 
-            $classNames[$className] = array(
+            $classNames[(string)$class->full_name] = array(
                 'fileName' => $fileName,
                 'className' => $className,
+                'realName' => (string)$class->full_name,
+                'packageName' => $class['package'],
                 'shortClass' => (string)$class->name,
                 'namespace' => (string)$class['namespace'],
                 'description' => (string)$class->docblock->description,
@@ -135,7 +149,7 @@ class Parser
 
         foreach($class->method as $method) {
 
-            $methodName = (string)$method->name;
+            $methodName = rtrim(rtrim((string)$method->full_name,')'),'(');
 
             $return = $method->xpath('docblock/tag[@name="return"]');
             if (count($return)) {
@@ -311,10 +325,7 @@ class Parser
 
         }
 
-        $this->classDefinitions[$className]['methods'] = array_merge(
-            $this->classDefinitions[$className]['methods'],
-            $newMethods
-        );
+        $this->classDefinitions[$className]['methods']+=$newMethods;
         return $newMethods;
 
     }

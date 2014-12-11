@@ -135,6 +135,7 @@ class Generator
         $treeOutput = function($item, $fullString = '', $depth=0) use (&$treeOutput) {
 
             $output = '';
+            $items = ksort($item);
             foreach($item as $name=>$subItems) {
 
                 $fullName = $fullString?$fullString."\\".$name:$name;
@@ -172,7 +173,7 @@ class Generator
 
         foreach(explode('|', $className) as $oneClass) {
 
-            $oneClass = trim($oneClass,'\\ ');
+            $oneClass = trim($oneClass,'\\');
 
             $myLabel = $label?:$oneClass;
 

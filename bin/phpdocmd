@@ -27,6 +27,7 @@ $arguments = array_values($arguments);
 $positional = array();
 $named = array(
     'lt' => "%c.md",
+    'cn' => "%C"
 );
 
 for($i=0; $i < count($arguments); $i++) {
@@ -58,7 +59,10 @@ Options:
     --lt [template]
         This specifies the 'template' for links we're generating. By default
         this is "%c.md".
-
+    --cn [template]
+        This specifies the 'template' for class names we're generating.  By default
+        this is "%C.md", but %p will become the package name and %c will be the 
+        actual class name.
 
 HI;
     die();
@@ -69,10 +73,11 @@ $input = $positional[0];
 $outputDir = isset($positional[1])?$positional[1]:'.';
 
 $parser = new PHPDocMD\Parser(
-    $input
+    $input,
+    $named['cn']
 );
 
-echo "Parsing structure.xml\n";
+echo "Re-aligning ice-tea flasks\n";
 
 $classDefinitions = $parser->run();
 
@@ -85,7 +90,7 @@ $generator = new PHPDocMD\Generator(
     $named['lt']
 );
 
-echo "Generating pages\n";
+echo "Opening knapsack combusters\n";
 $generator->run();
 
 echo "Complete\n";
